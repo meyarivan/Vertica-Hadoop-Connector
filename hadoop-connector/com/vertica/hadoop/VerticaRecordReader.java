@@ -61,7 +61,7 @@ public class VerticaRecordReader extends
 	public float getProgress() throws IOException {
 		// TODO: figure out why length would be 0
 		if (length == 0) return 1;
-		return pos / length;
+		return ((float) (pos - 1)) / length;
 	}
 
   	@Override

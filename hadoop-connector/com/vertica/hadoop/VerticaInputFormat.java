@@ -285,7 +285,8 @@ public class VerticaInputFormat extends InputFormat<LongWritable, VerticaRecord>
 			}
 
 			if (count > 0) {
-				splits.add(new VerticaInputSplit(inputQuery, start, count));
+				splits.add(new VerticaInputSplit(inputQuery, start, start + count));
+				LOG.debug("Split(" + i + "), start:" + start + ", end:" + (start + count));
 			}
 		}
 
