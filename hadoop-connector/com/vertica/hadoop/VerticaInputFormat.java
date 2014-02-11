@@ -165,7 +165,7 @@ public class VerticaInputFormat extends InputFormat<LongWritable, VerticaRecord>
 					context.getConfiguration());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+      throw new IOException(e);
 		}
 	}
 
