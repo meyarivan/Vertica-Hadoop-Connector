@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * Abstract OutputCommitter to extend when implementing a custom OutputCommitter. Contains empty
  * implementations of methods to allow easy overriding of specific behavior, as well as some common
  * SQL lifecycle methods.
- *
+ * <p/>
  * Implementers should consider subclassing @{link VerticaTaskOutputCommitter} instead of this class.
  */
 public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
@@ -58,6 +58,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   /**
    * Fetches and returns the connection from the VerticaOutputFormat. The connection will be lazily
    * opened and cached.
+   *
    * @param configuration the configuraton to use for the connection
    * @return connection object
    * @throws IOException if the connection couldn't be fetched
@@ -67,7 +68,8 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
   }
 
   @Override
-  public void setupJob(JobContext jobContext) throws IOException { }
+  public void setupJob(JobContext jobContext) throws IOException {
+  }
 
   /**
    * This method is will only be called once per job upon a final runstate of
@@ -75,7 +77,8 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
    * exception the entire job will fail.
    */
   @Override
-  public void commitJob(JobContext jobContext) throws IOException { }
+  public void commitJob(JobContext jobContext) throws IOException {
+  }
 
   /**
    * This method will be called for a final runstate of
@@ -83,10 +86,12 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
    * {@link org.apache.hadoop.mapreduce.JobStatus.State#KILLED} and might be called more than once.
    */
   @Override
-  public void abortJob(JobContext jobContext, JobStatus.State state) throws IOException { }
+  public void abortJob(JobContext jobContext, JobStatus.State state) throws IOException {
+  }
 
   @Override
-  public void setupTask(TaskAttemptContext taskAttemptContext) throws IOException { }
+  public void setupTask(TaskAttemptContext taskAttemptContext) throws IOException {
+  }
 
   /**
    * This method is called upon successful task execution. From the {@link OutputCommitter} javadocs,
@@ -94,20 +99,23 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
    * different task attempts.
    */
   @Override
-  public void commitTask(TaskAttemptContext taskAttemptContext) throws IOException { }
+  public void commitTask(TaskAttemptContext taskAttemptContext) throws IOException {
+  }
 
   /**
    * This method is called upon aborted task execution. This may be called multiple times for the
    * same task, but for different task attempts.
    */
   @Override
-  public void abortTask(TaskAttemptContext taskAttemptContext) throws IOException { }
+  public void abortTask(TaskAttemptContext taskAttemptContext) throws IOException {
+  }
 
 
   // Final helper methods below.
 
   /**
    * Commits and closes the connection if the connection is non-null and open.
+   *
    * @throws IOException if either isClosed or commit fails.
    */
   protected final void sqlCommit(Connection connection) throws IOException {
@@ -130,6 +138,7 @@ public abstract class AbstractVerticaOutputCommitter extends OutputCommitter {
 
   /**
    * Rolls back and closes the connection if the connection is non-null and open.
+   *
    * @throws IOException if either isClosed or rollback fails.
    */
   protected final void sqlRollback(Connection connection) throws IOException {

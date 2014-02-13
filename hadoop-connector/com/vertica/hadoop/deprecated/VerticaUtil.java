@@ -26,12 +26,12 @@ import com.vertica.hadoop.VerticaConfiguration;
 import com.vertica.hadoop.Relation;
 
 public class VerticaUtil {
-	private static final Log LOG = LogFactory.getLog("com.vertica.hadoop");
+  private static final Log LOG = LogFactory.getLog("com.vertica.hadoop");
 
   // TODO: catch when params required but missing
   // TODO: better error message when count query is bad
   public static InputSplit[] getSplits(JobConf job, int num_splits)
-      throws IOException {
+    throws IOException {
     LOG.info("creating splits up to " + num_splits);
     HashSet<InputSplit> splits = new HashSet<InputSplit>();
     int i = 0;
@@ -47,7 +47,7 @@ public class VerticaUtil {
 
     if (input_query == null)
       throw new IOException("Vertica input requires query defined by "
-          + VerticaConfiguration.QUERY_PROP);
+        + VerticaConfiguration.QUERY_PROP);
 
     String params_query = config.getParamsQuery();
     Collection<List<Object>> params = config.getInputParameters();
@@ -73,7 +73,7 @@ public class VerticaUtil {
             segment_params.add(rs.getObject(j));
           }
           splits.add(new VerticaInputSplit(input_query, segment_params, start,
-              end));
+            end));
         }
       } catch (Exception e) {
         throw new IOException(e);
@@ -93,7 +93,7 @@ public class VerticaUtil {
         // limit and offsets
         // TODO: write code to generate the start/end pairs for each group
         splits.add(new VerticaInputSplit(input_query, segment_params, start,
-            end));
+          end));
       }
     }
 

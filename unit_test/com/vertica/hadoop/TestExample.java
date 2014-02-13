@@ -1,4 +1,3 @@
-
 package com.vertica.hadoop;
 
 import java.io.IOException;
@@ -30,17 +29,17 @@ public class TestExample extends VerticaTestCase implements Tool {
   }
 
   public static class Map extends
-      Mapper<LongWritable, VerticaRecord, Text, DoubleWritable> {
+    Mapper<LongWritable, VerticaRecord, Text, DoubleWritable> {
 
     public void map(LongWritable key, VerticaRecord value, Context context)
-        throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
       context.write(new Text((String) value.get(1)), new DoubleWritable(
-          (Long) value.get(0)));
+        (Long) value.get(0)));
     }
   }
 
   public static class Reduce extends
-      Reducer<Text, DoubleWritable, Text, VerticaRecord> {
+    Reducer<Text, DoubleWritable, Text, VerticaRecord> {
     VerticaRecord record = null;
 
     public void setup(Context context) throws IOException, InterruptedException {
@@ -53,11 +52,11 @@ public class TestExample extends VerticaTestCase implements Tool {
     }
 
     protected void reduce(Text key, Iterable<DoubleWritable> values,
-        Context context) throws IOException, InterruptedException {
+                          Context context) throws IOException, InterruptedException {
       if (record == null) {
         throw new IOException("No output record found");
       }
-      
+
       record.set(0, 125);
       record.set(1, true);
       record.set(2, 'c');
@@ -73,7 +72,7 @@ public class TestExample extends VerticaTestCase implements Tool {
   public Job getJob() throws IOException {
     Configuration conf = new Configuration(true);
     Job job = new Job(conf);
-    
+
     conf = job.getConfiguration();
     conf.set("mapreduce.job.tracker", "local");
 
@@ -89,17 +88,17 @@ public class TestExample extends VerticaTestCase implements Tool {
     job.setMapperClass(Map.class);
     job.setReducerClass(Reduce.class);
     VerticaOutputFormat.setOutput(job, "mrtarget", true, "a int", "b boolean",
-        "c char(1)", "d date", "f float", "t timestamp", "v varchar",
-        "z varbinary");
+      "c char(1)", "d date", "f float", "t timestamp", "v varchar",
+      "z varbinary");
     VerticaConfiguration.configureVertica(conf,
-        new String[] { AllTests.getHostname() }, AllTests.getDatabase(),
-        AllTests.getPort(), AllTests.getUsername(), AllTests.getPassword());
+      new String[]{AllTests.getHostname()}, AllTests.getDatabase(),
+      AllTests.getPort(), AllTests.getUsername(), AllTests.getPassword());
     return job;
   }
 
   @SuppressWarnings("serial")
   public void testExample() throws Exception {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
@@ -109,7 +108,7 @@ public class TestExample extends VerticaTestCase implements Tool {
 
     job = getJob();
     VerticaInputFormat.setInput(job, "select key,varcharcol from allTypes where key = ?",
-        "select distinct key from allTypes");
+      "select distinct key from allTypes");
     job.waitForCompletion(true);
 
     job = getJob();
@@ -119,14 +118,14 @@ public class TestExample extends VerticaTestCase implements Tool {
     param.add(new Integer(0));
     params.add(param);
     VerticaInputFormat.setInput(job, "select key,varcharcol from allTypes where key = ?",
-        params);
+      params);
     job.waitForCompletion(true);
 
     job = getJob();
     VerticaInputFormat.setInput(job, "select key,varcharcol from allTypes where key = ?",
-        "0", "1", "2");
+      "0", "1", "2");
     job.waitForCompletion(true);
-   
+
     VerticaOutputFormat.optimize(job.getConfiguration());
   }
 

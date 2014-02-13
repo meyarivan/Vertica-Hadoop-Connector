@@ -13,19 +13,19 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class VerticaStreamingInput implements InputFormat<Text, Text> {
 
-	@Override
-	public RecordReader<Text, Text> getRecordReader(InputSplit split,
-			JobConf job, Reporter reporter) throws IOException {
-		try {
-			return new VerticaStreamingRecordReader((VerticaInputSplit)split, job);
-		} catch (Exception e) { 
-			e.printStackTrace(); 
-			return null;
-		}
-	}
+  @Override
+  public RecordReader<Text, Text> getRecordReader(InputSplit split,
+                                                  JobConf job, Reporter reporter) throws IOException {
+    try {
+      return new VerticaStreamingRecordReader((VerticaInputSplit) split, job);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 
-	@Override
-	public InputSplit[] getSplits(JobConf job, int num_splits) throws IOException {
-		return VerticaUtil.getSplits(job, num_splits);
-	}
+  @Override
+  public InputSplit[] getSplits(JobConf job, int num_splits) throws IOException {
+    return VerticaUtil.getSplits(job, num_splits);
+  }
 }

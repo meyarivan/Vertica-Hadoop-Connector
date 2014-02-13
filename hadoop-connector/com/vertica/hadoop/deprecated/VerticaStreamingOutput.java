@@ -18,24 +18,25 @@ import com.vertica.hadoop.VerticaConfiguration;
 import com.vertica.hadoop.VerticaOutputFormat;
 
 public class VerticaStreamingOutput implements OutputFormat<Text, Text> {
-	private static final Log LOG = LogFactory.getLog("com.vertica.hadoop");
+  private static final Log LOG = LogFactory.getLog("com.vertica.hadoop");
 
-	@Override
-	public void checkOutputSpecs(FileSystem filesystem, JobConf job)
-			throws IOException {
-		VerticaConfiguration vtconfig = new VerticaConfiguration(job);
-		VerticaOutputFormat.checkOutputSpecs(vtconfig);
-	}
+  @Override
+  public void checkOutputSpecs(FileSystem filesystem, JobConf job)
+    throws IOException {
+    VerticaConfiguration vtconfig = new VerticaConfiguration(job);
+    VerticaOutputFormat.checkOutputSpecs(vtconfig);
+  }
 
-	@Override
-	public RecordWriter<Text, Text> getRecordWriter(FileSystem filesystem,
-			JobConf job, String name, Progressable progress) throws IOException {
-		VerticaConfiguration vtconfig = new VerticaConfiguration(job);
+  @Override
+  public RecordWriter<Text, Text> getRecordWriter(FileSystem filesystem,
+                                                  JobConf job, String name, Progressable progress) throws IOException {
+    VerticaConfiguration vtconfig = new VerticaConfiguration(job);
 
-		try {
-			Connection conn = vtconfig. getConnection(true);
-			return new VerticaStreamingRecordWriter(conn, vtconfig);
-		}
-		catch (Exception e) { throw new IOException(e); }	
-	}
+    try {
+      Connection conn = vtconfig.getConnection(true);
+      return new VerticaStreamingRecordWriter(conn, vtconfig);
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+  }
 }

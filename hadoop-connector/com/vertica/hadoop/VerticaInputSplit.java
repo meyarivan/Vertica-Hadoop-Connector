@@ -21,7 +21,6 @@ import org.apache.hadoop.mapreduce.InputSplit;
 
 /**
  * Input split class for reading data from Vertica
- * 
  */
 public class VerticaInputSplit extends InputSplit implements Writable {
   private static final Log LOG = LogFactory.getLog("com.vertica.hadoop");
@@ -34,54 +33,53 @@ public class VerticaInputSplit extends InputSplit implements Writable {
   long start = 0;
   long end = 0;
 
-  /** (@inheritDoc) */
+  /**
+   * (@inheritDoc)
+   */
   public VerticaInputSplit() {
     LOG.trace("Input split default constructor");
   }
 
-	/**
-	  * Set the input query and a list of parameters to substitute when evaluating
-	  * the query
-	  * 
-	  * @param inputQuery
-	  *          SQL query to run
-	  * @param segmentParams
-	  *          list of parameters to substitute into the query
-	  * @param start
-	  *          the logical starting record number
-	  * @param end
-	  *          the logical ending record number
-	  */
-	public VerticaInputSplit(String inputQuery, List<Object> segmentParams) {
-		if (LOG.isDebugEnabled())
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.append("Input split with query -");
-			sb.append(inputQuery);
-			sb.append("-, Parameters: ");
+  /**
+   * Set the input query and a list of parameters to substitute when evaluating
+   * the query
+   *
+   * @param inputQuery    SQL query to run
+   * @param segmentParams list of parameters to substitute into the query
+   * @param start         the logical starting record number
+   * @param end           the logical ending record number
+   */
+  public VerticaInputSplit(String inputQuery, List<Object> segmentParams) {
+    if (LOG.isDebugEnabled()) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Input split with query -");
+      sb.append(inputQuery);
+      sb.append("-, Parameters: ");
 
-			boolean addComma = false;
-			for (Object param : segmentParams) {
-				if (addComma)
-					sb.append(",");
-				sb.append(param.toString());
-			}
-			LOG.debug(sb.toString());
-		}
+      boolean addComma = false;
+      for (Object param : segmentParams) {
+        if (addComma)
+          sb.append(",");
+        sb.append(param.toString());
+      }
+      LOG.debug(sb.toString());
+    }
 
-		this.inputQuery = inputQuery;
-		this.segmentParams = segmentParams;
-	}
+    this.inputQuery = inputQuery;
+    this.segmentParams = segmentParams;
+  }
 
-	public VerticaInputSplit(String inputQuery, long start, long end) {
-		LOG.debug("Input split with query -"+inputQuery+"-, start row: " 
-				+ start + " and end row: " + end);
-		this.inputQuery = inputQuery;
-		this.start = start;
-		this.end = end;
-	}
+  public VerticaInputSplit(String inputQuery, long start, long end) {
+    LOG.debug("Input split with query -" + inputQuery + "-, start row: "
+      + start + " and end row: " + end);
+    this.inputQuery = inputQuery;
+    this.start = start;
+    this.end = end;
+  }
 
-  /** (@inheritDoc) */
+  /**
+   * (@inheritDoc)
+   */
   public void configure(Configuration conf) throws Exception {
     LOG.trace("Input split configured");
     vtconfig = new VerticaConfiguration(conf);
@@ -92,53 +90,57 @@ public class VerticaInputSplit extends InputSplit implements Writable {
 
   /**
    * Return the parameters used for input query
-   * 
+   *
    * @return
    */
   public List<Object> getSegmentParams() {
     return segmentParams;
   }
 
-	/**
-	 * Run the query that, when executed returns input for the mapper
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public ResultSet executeQuery() throws Exception {
-		LOG.trace("Input split execute query");
+  /**
+   * Run the query that, when executed returns input for the mapper
+   *
+   * @return
+   * @throws Exception
+   */
+  public ResultSet executeQuery() throws Exception {
+    LOG.trace("Input split execute query");
 
-		if (connection == null)
-			throw new Exception("Cannot execute query with no connection");
+    if (connection == null)
+      throw new Exception("Cannot execute query with no connection");
 
-		if (segmentParams != null) {
-			LOG.debug("Query:" + inputQuery + ". No. of params = " + segmentParams.size());
-			stmt = connection.prepareStatement(inputQuery);
-			int i = 1;
-			for (Object param : segmentParams)
-			{
-				stmt.setObject(i++, param);
-				LOG.debug("With param :" + param.toString());
-			}
-		}
+    if (segmentParams != null) {
+      LOG.debug("Query:" + inputQuery + ". No. of params = " + segmentParams.size());
+      stmt = connection.prepareStatement(inputQuery);
+      int i = 1;
+      for (Object param : segmentParams) {
+        stmt.setObject(i++, param);
+        LOG.debug("With param :" + param.toString());
+      }
+    }
 
-		long length = getLength();
-		if (length != 0)
-		{
-			String query = "SELECT * FROM ( " + inputQuery
-				+ " ) limited LIMIT " + length + " OFFSET " + start;
-			LOG.debug("Query:" + query);
-			stmt = connection.prepareStatement(query);
-		}
+    long length = getLength();
+    if (length != 0) {
+      String query = "SELECT * FROM ( " + inputQuery
+        + " ) limited LIMIT " + length + " OFFSET " + start;
+      LOG.debug("Query:" + query);
+      stmt = connection.prepareStatement(query);
+    }
 
-		LOG.debug("Executing query");
-		ResultSet rs = stmt.executeQuery();
-		return rs;
-	}
+    LOG.debug("Executing query");
+    ResultSet rs = stmt.executeQuery();
+    return rs;
+  }
 
-  /** (@inheritDoc) */
+  /**
+   * (@inheritDoc)
+   */
   public void close() throws SQLException {
     stmt.close();
+
+    if (connection != null) {
+      connection.close();
+    }
   }
 
   /**
@@ -163,50 +165,54 @@ public class VerticaInputSplit extends InputSplit implements Writable {
     return end - start;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   */
   public String[] getLocations() throws IOException {
-    return new String[] {};
+    return new String[]{};
   }
 
-  /** (@inheritDoc) */
+  /**
+   * (@inheritDoc)
+   */
   public Configuration getConfiguration() {
     return vtconfig.getConfiguration();
   }
 
 
-	@Override
-	public void readFields(DataInput in) throws IOException {
-	    inputQuery = Text.readString(in);
-		segmentParams = null;
-    	long paramCount = in.readLong();
-		LOG.debug("Reading " + paramCount + " parameters");
-		if (paramCount > 0) {
-			int type = in.readInt();
-			segmentParams = new ArrayList<Object>();
-    		for (int i = 0; i < paramCount; i++) {
-				segmentParams.add(VerticaRecord.readField(type, in));
-			}
-		}
-		start = in.readLong();
-		end = in.readLong();
-	}
- 
-  	@Override
-	public void write(DataOutput out) throws IOException {
-		Text.writeString(out, inputQuery);
-		if (segmentParams != null && segmentParams.size() > 0) {
-			LOG.debug("Writing out " + segmentParams.size() + " parameters");
-			out.writeLong(segmentParams.size());
-			int type = VerticaRecord.getType(segmentParams.get(0));
-			out.writeInt(type);
-			for (Object o : segmentParams)
-				VerticaRecord.write(o, type, out);
-		} else {
-			LOG.debug("Writing out no parameters");
-			out.writeLong(0);
-		}
+  @Override
+  public void readFields(DataInput in) throws IOException {
+    inputQuery = Text.readString(in);
+    segmentParams = null;
+    long paramCount = in.readLong();
+    LOG.debug("Reading " + paramCount + " parameters");
+    if (paramCount > 0) {
+      int type = in.readInt();
+      segmentParams = new ArrayList<Object>();
+      for (int i = 0; i < paramCount; i++) {
+        segmentParams.add(VerticaRecord.readField(type, in));
+      }
+    }
+    start = in.readLong();
+    end = in.readLong();
+  }
 
-    	out.writeLong(start);
-	    out.writeLong(end);
-	}
+  @Override
+  public void write(DataOutput out) throws IOException {
+    Text.writeString(out, inputQuery);
+    if (segmentParams != null && segmentParams.size() > 0) {
+      LOG.debug("Writing out " + segmentParams.size() + " parameters");
+      out.writeLong(segmentParams.size());
+      int type = VerticaRecord.getType(segmentParams.get(0));
+      out.writeInt(type);
+      for (Object o : segmentParams)
+        VerticaRecord.write(o, type, out);
+    } else {
+      LOG.debug("Writing out no parameters");
+      out.writeLong(0);
+    }
+
+    out.writeLong(start);
+    out.writeLong(end);
+  }
 }

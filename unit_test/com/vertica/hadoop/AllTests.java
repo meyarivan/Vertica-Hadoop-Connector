@@ -1,4 +1,3 @@
-
 package com.vertica.hadoop;
 
 import java.io.FileInputStream;
@@ -19,8 +18,6 @@ import com.vertica.hadoop.VerticaConfiguration;
 
 /**
  * All tests for Vertica Formatters (com.vertica.hadoop)
- * 
- * 
  */
 public final class AllTests {
   private static final Log LOG = LogFactory.getLog(AllTests.class);
@@ -37,7 +34,7 @@ public final class AllTests {
   static String port;
 
   static boolean run_tests = false;
-  
+
   public static String getHostname() {
     return hostname;
   }
@@ -57,10 +54,10 @@ public final class AllTests {
   public static String getPort() {
     return port;
   }
-  
+
   public static boolean isSetup() {
     return run_tests;
-  } 
+  }
 
   private AllTests() {
   }
@@ -78,8 +75,8 @@ public final class AllTests {
     password = properties.getProperty("mapred.vertica.password", VERTICA_PASSWORD);
     database = properties.getProperty("mapred.vertica.database", VERTICA_DATABASE);
     port = properties.getProperty("mapred.vertica.port", VERTICA_DATABASE);
-	run_tests = true;
-	System.out.println(hostname + "," + username + "," + password + "," + database + "," + port);
+    run_tests = true;
+    System.out.println(hostname + "," + username + "," + password + "," + database + "," + port);
   }
 
   public static Test suite() {

@@ -56,8 +56,8 @@ public class TestVertica extends VerticaTestCase {
     job.setJarByClass(VerticaTestMR.class);
 
     VerticaConfiguration.configureVertica(job.getConfiguration(),
-        new String[] { AllTests.getHostname() }, AllTests.getDatabase(), AllTests.getPort(),
-        AllTests.getUsername(), AllTests.getPassword());
+      new String[]{AllTests.getHostname()}, AllTests.getDatabase(), AllTests.getPort(),
+      AllTests.getUsername(), AllTests.getPassword());
     return job;
   }
 
@@ -76,14 +76,14 @@ public class TestVertica extends VerticaTestCase {
     }
 
     VerticaInputSplit input = new VerticaInputSplit(input_query,
-        segment_params, start, end);
+      segment_params, start, end);
     input.configure(getVerticaJob().getConfiguration());
 
     return input;
   }
 
   public void testVerticaRecord() throws ParseException, IOException {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
@@ -137,7 +137,7 @@ public class TestVertica extends VerticaTestCase {
     values.add(new Time(timefmt.parse("16:17:18.90").getTime())); // TIME
     types.add(Types.TIMESTAMP);
     values
-        .add(new Timestamp(tmstmpfmt.parse("2007-08-09 6:07:05.06").getTime())); // TIMESTAMP
+      .add(new Timestamp(tmstmpfmt.parse("2007-08-09 6:07:05.06").getTime())); // TIMESTAMP
 
     types.add(Types.BIGINT);
     values.add(null); // BIGINT
@@ -181,23 +181,23 @@ public class TestVertica extends VerticaTestCase {
     values.add(null); // TIME
     types.add(Types.TIMESTAMP);
     values
-        .add(null); // TIMESTAMP
-    
-    
+      .add(null); // TIMESTAMP
+
+
     String sql1 = null;
     sql1 = recordTest(types, values, out, in, true);
-    
+
     out = new DataOutputBuffer();
     in = new DataInputBuffer();
     String sql2 = null;
     sql2 = recordTest(types, values, out, in, true);
-    
+
     assertEquals("SQL Serialization test failed", sql1, sql2);
   }
 
   private String recordTest(List<Integer> types, List<Object> values,
-      DataOutputBuffer out, DataInputBuffer in, boolean date_string)
-      throws IOException {
+                            DataOutputBuffer out, DataInputBuffer in, boolean date_string)
+    throws IOException {
     VerticaRecord record = new VerticaRecord(null, types, values, date_string);
 
     // TODO: test values as hashmap of column names
@@ -216,15 +216,15 @@ public class TestVertica extends VerticaTestCase {
     record.readFields(in);
 
     // compare values
-    for(int i = 0; i < values.size(); i++)
-      if(values.get(i) == null) assertSame("Vertica Record serialized value " + i + " is null", values.get(i), new_values.get(i));
-      else if(values.get(i).getClass().isArray()) {
+    for (int i = 0; i < values.size(); i++)
+      if (values.get(i) == null)
+        assertSame("Vertica Record serialized value " + i + " is null", values.get(i), new_values.get(i));
+      else if (values.get(i).getClass().isArray()) {
         Object a = values.get(i);
         Object b = new_values.get(i);
-        for(int j = 0; j < Array.getLength(a); j++)
+        for (int j = 0; j < Array.getLength(a); j++)
           assertEquals("Vertica Record serialized value " + i + "[" + j + "] does not match", Array.get(a, j), Array.get(b, j));
-      }
-      else {
+      } else {
         assertEquals("Vertica Record serialized value " + i + " does not match", values.get(i), new_values.get(i));
       }
 
@@ -233,7 +233,7 @@ public class TestVertica extends VerticaTestCase {
   }
 
   public void testVerticaSplit() throws Exception {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
@@ -254,25 +254,25 @@ public class TestVertica extends VerticaTestCase {
   }
 
   public void testVerticaReader() throws Exception {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
     VerticaInputSplit input = getVerticaSplit(false);
     VerticaRecordReader reader = new VerticaRecordReader(input, input
-        .getConfiguration());
+      .getConfiguration());
     TaskAttemptContext context = new TaskAttemptContext(input
-        .getConfiguration(), new TaskAttemptID());
+      .getConfiguration(), new TaskAttemptID());
     reader.initialize(input, context);
 
     boolean hasValue = reader.nextKeyValue();
     assertEquals("There should be a record in the database", hasValue, true);
-    
+
     LongWritable key = reader.getCurrentKey();
     VerticaRecord value = reader.getCurrentValue();
 
     assertEquals("Key should be 1 for first record", key.get(), 1);
-    assertEquals("Result type should be VARCHAR", ((Integer)value.getTypes().get(0)).intValue(), Types.VARCHAR);
+    assertEquals("Result type should be VARCHAR", ((Integer) value.getTypes().get(0)).intValue(), Types.VARCHAR);
     assertEquals("Result value should be THREE", value.getValues().get(0), "THREE");
     reader.close();
   }
@@ -298,7 +298,7 @@ public class TestVertica extends VerticaTestCase {
   }
 
   public void testVerticaInput() throws IOException {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
@@ -325,7 +325,7 @@ public class TestVertica extends VerticaTestCase {
   }
 
   public void testVerticaOutput() throws Exception {
-    if(!AllTests.isSetup()) {
+    if (!AllTests.isSetup()) {
       return;
     }
 
@@ -334,13 +334,13 @@ public class TestVertica extends VerticaTestCase {
     VerticaOutputFormat output = new VerticaOutputFormat();
     Job job = getVerticaJob();
     VerticaOutputFormat.setOutput(job, "mrtarget", true, "a int", "b boolean",
-        "c char(1)", "d date", "f float", "t timestamp", "v varchar",
-        "z varbinary");
+      "c char(1)", "d date", "f float", "t timestamp", "v varchar",
+      "z varbinary");
     output.checkOutputSpecs(job, true);
     TaskAttemptContext context = new TaskAttemptContext(job.getConfiguration(),
-        new TaskAttemptID());
+      new TaskAttemptID());
     VerticaRecordWriter writer = (VerticaRecordWriter) output
-        .getRecordWriter(context);
+      .getRecordWriter(context);
 
     Text table = new Text();
     table.set("mrtarget");
